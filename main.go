@@ -4,19 +4,14 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"strings"
 
-	"github.com/Ciobi0212/pokedex/commands"
+	"github.com/Ciobi0212/pokedex/internal/commands"
+	"github.com/Ciobi0212/pokedex/internal/utils"
 )
 
-func cleanInput(textInput string) []string {
-	textInput = strings.ToLower(textInput)
-	split := strings.Fields(textInput)
-
-	return split
-}
-
 func main() {
+	appState := commands.GetInitAppState()
+
 	commandMap := commands.GetCommandMap()
 
 	scanner := bufio.NewScanner(os.Stdin)
@@ -31,7 +26,7 @@ func main() {
 		textInput := scanner.Text()
 
 		// Clean input
-		inputSlice := cleanInput(textInput)
+		inputSlice := utils.CleanInput(textInput)
 
 		// Get command
 		commandWord := inputSlice[0]
@@ -43,6 +38,9 @@ func main() {
 			continue
 		}
 
-		command.Callback()
+		err := command.Callback(appState, inputSlice[1:])
+		if err != nil {
+			fmt.Println(err)
+		}
 	}
 }

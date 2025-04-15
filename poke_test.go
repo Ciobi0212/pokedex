@@ -3,6 +3,10 @@ package main
 import (
 	"strings"
 	"testing"
+	"time"
+
+	"github.com/Ciobi0212/pokedex/internal/pokecache"
+	"github.com/Ciobi0212/pokedex/internal/utils"
 )
 
 func TestCleanInput(t *testing.T) {
@@ -27,7 +31,7 @@ func TestCleanInput(t *testing.T) {
 	}
 
 	for _, testCase := range cases {
-		funcOutput := cleanInput(testCase.input)
+		funcOutput := utils.CleanInput(testCase.input)
 		if len(funcOutput) != len(testCase.output) {
 			t.Errorf("Sizes don't match: %v vs %v", len(funcOutput), len(testCase.output))
 		}
@@ -38,5 +42,25 @@ func TestCleanInput(t *testing.T) {
 			}
 		}
 	}
+}
 
+func TestReadLoop(t *testing.T) {
+	const baseTime = 5 * time.Millisecond
+	const waitTime = baseTime + 5*time.Millisecond
+	cache := pokecache.NewCache(baseTime)
+	cache.Add("https://example.com", []byte("testdata"))
+
+	_, ok := cache.Get("https://example.com")
+	if !ok {
+		t.Errorf("expected to find key")
+		return
+	}
+
+	time.Sleep(waitTime)
+
+	_, ok = cache.Get("https://example.com")
+	if ok {
+		t.Errorf("expected to not find key")
+		return
+	}
 }
