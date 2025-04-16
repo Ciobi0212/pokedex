@@ -80,7 +80,7 @@ func commandMapCallback(state *AppState, params []string) error {
 
 	mapNames, err := apipokeinteraction.GetLocationAreas(state.mapPagOffset, state.cache)
 	if err != nil {
-		return fmt.Errorf("error getting location areas: %w", err)
+		return err
 	}
 
 	for _, name := range mapNames {
@@ -109,7 +109,7 @@ func commandMapbCallback(state *AppState, params []string) error {
 	mapNames, err := apipokeinteraction.GetLocationAreas(state.mapPagOffset, state.cache)
 
 	if err != nil {
-		return fmt.Errorf("error getting areas %w", err)
+		return err
 	}
 
 	for _, name := range mapNames {
@@ -128,7 +128,7 @@ func commandExploreCallback(state *AppState, params []string) error {
 
 	pokemonsName, err := apipokeinteraction.GetPokemonsFromArea(areaName, state.cache)
 	if err != nil {
-		return fmt.Errorf("error getting pokemons: %w", err)
+		return err
 	}
 
 	for _, name := range pokemonsName {
@@ -148,7 +148,7 @@ func commandCatchCallback(state *AppState, params []string) error {
 	pokemonInfo, err := apipokeinteraction.GetPokemonInfo(pokemonName, state.cache)
 
 	if err != nil {
-		return fmt.Errorf("error getting pokemon base exp: %w", err)
+		return err
 	}
 
 	fmt.Printf("Throwing a Pokeball at %s...\n", pokemonName)
@@ -176,7 +176,7 @@ func commandInspectCallback(state *AppState, params []string) error {
 
 	pokemonInfo, ok := state.caughtPokemon[pokemonName]
 	if !ok {
-		return fmt.Errorf("you didn't caught this pokemon")
+		return fmt.Errorf("you haven't caught this pokemon")
 	}
 
 	yamlBytes, err := yaml.Marshal(pokemonInfo)

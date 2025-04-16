@@ -2,6 +2,7 @@ package apipokeinteraction
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -10,6 +11,8 @@ import (
 	"github.com/Ciobi0212/pokedex/internal/models"
 	"github.com/Ciobi0212/pokedex/internal/pokecache"
 )
+
+var ErrNotFound = errors.New("resouce not found")
 
 func FetchAndUnmarshal[T any](url string, cache *pokecache.Cache) (*T, error) {
 	cacheKey := url
@@ -23,6 +26,12 @@ func FetchAndUnmarshal[T any](url string, cache *pokecache.Cache) (*T, error) {
 
 		if err != nil {
 			return nil, fmt.Errorf("error getting calling endpoint: %w", err)
+		}
+
+		defer res.Body.Close()
+
+		if res.StatusCode > 299 {
+			return nil, ErrNotFound
 		}
 
 		resBytes, err := io.ReadAll(res.Body)
@@ -74,6 +83,11 @@ func GetPokemonsFromArea(areaName string, cache *pokecache.Cache) ([]string, err
 	areaInfo, err := FetchAndUnmarshal[models.AreaPokemonInfo](url, cache)
 
 	if err != nil {
+
+		if errors.Is(err, ErrNotFound) {
+			return nil, fmt.Errorf("area %s doesn't exist, try another", areaName)
+		}
+
 		return nil, fmt.Errorf("error fetch and unmarshal: %w", err)
 	}
 
@@ -92,6 +106,9 @@ func GetPokemonInfo(pokemonName string, cache *pokecache.Cache) (*models.Pokemon
 	pokemonInfo, err := FetchAndUnmarshal[models.Pokemon](url, cache)
 
 	if err != nil {
+		if errors.Is(err, ErrNotFound) {
+			return nil, fmt.Errorf("pokemon %s doesn't exist, try another", pokemonName)
+		}
 		return nil, fmt.Errorf("error fetch and unmarshal: %w", err)
 	}
 
