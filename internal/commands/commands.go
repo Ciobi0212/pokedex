@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
+	"sort"
 	"time"
 
 	"github.com/Ciobi0212/pokedex/internal/apipokeinteraction"
@@ -42,17 +43,30 @@ func commandExitCallback(state *AppState, params []string) error {
 }
 
 func commandHelpCommand(state *AppState, params []string) error {
+
 	if len(params) != 0 {
 		return fmt.Errorf("help command doesn't support any params")
 	}
 
-	helpString := `Welcome to the Pokedex!
-Usage:
+	fmt.Println("\nWelcome to the Pokedex!")
+	fmt.Println("Here are the available commands:")
+	fmt.Println("")
 
-help: Displays a help message
-exit: Exit the Pokedex`
+	availableCommands := GetCommandMap()
 
-	fmt.Println(helpString)
+	commandNames := make([]string, 0, len(availableCommands))
+	for name := range availableCommands {
+		commandNames = append(commandNames, name)
+	}
+	sort.Strings(commandNames)
+
+	for _, name := range commandNames {
+		command := availableCommands[name]
+
+		fmt.Printf("%-10s : %s\n", command.Name, command.Description)
+
+	}
+	fmt.Println("")
 
 	return nil
 }
@@ -198,43 +212,43 @@ func GetCommandMap() map[string]CliCommand {
 	commandMap := map[string]CliCommand{
 		"exit": {
 			Name:        "exit",
-			Description: "Exits the program",
+			Description: "Exits the Pokedex application",
 			Callback:    commandExitCallback,
 		},
-
 		"help": {
 			Name:        "help",
-			Description: "Provides the user with guidance",
+			Description: "Displays this help message",
 			Callback:    commandHelpCommand,
 		},
 		"map": {
 			Name:        "map",
-			Description: "Provides the user with the next 20 location areas",
+			Description: "Displays the next page of location areas",
 			Callback:    commandMapCallback,
 		},
 		"mapb": {
-			Name:        "mabp",
-			Description: "Goes back a page of location areas, if it was generated",
+			Name:        "mapb",
+			Description: "Displays the previous page of location areas",
 			Callback:    commandMapbCallback,
 		},
 		"explore": {
-			Name:        "explore",
-			Description: "Gets pokemons from area",
+			Name: "explore",
+
+			Description: "Lists the Pokémon available in a specific location area. Usage: explore <location_area_name>",
 			Callback:    commandExploreCallback,
 		},
 		"catch": {
 			Name:        "catch",
-			Description: "Try to catch a pokemon",
+			Description: "Attempts to catch a specified Pokémon found in an area. Usage: catch <pokemon_name>",
 			Callback:    commandCatchCallback,
 		},
 		"inspect": {
 			Name:        "inspect",
-			Description: "See stats of a caught pokemon",
+			Description: "Shows details of a Pokémon you have already caught. Usage: inspect <pokemon_name>",
 			Callback:    commandInspectCallback,
 		},
 		"pokedex": {
 			Name:        "pokedex",
-			Description: "Lists all pokemons in pokedex",
+			Description: "Lists all the Pokémon currently in your Pokedex (that you have caught)",
 			Callback:    commandPokedexCallback,
 		},
 	}

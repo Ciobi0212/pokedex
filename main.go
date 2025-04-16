@@ -25,6 +25,11 @@ func main() {
 		// Read user input
 		textInput := scanner.Text()
 
+		if len(textInput) <= 0 {
+			fmt.Println("Type something you silly :)")
+			continue
+		}
+
 		// Clean input
 		inputSlice := utils.CleanInput(textInput)
 
@@ -34,7 +39,7 @@ func main() {
 		// Execute command if supported
 		command, wasFound := commandMap[commandWord]
 		if !wasFound {
-			fmt.Println("Unknown command")
+			fmt.Println("Unknown command, type help to see what you can do")
 			continue
 		}
 
